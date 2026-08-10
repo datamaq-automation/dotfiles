@@ -3,10 +3,13 @@
 LXQt Super Key Daemon — XGrabKey + XTestFakeKeyEvent.
 Detecta tap de Super (press+release sin otras teclas en <500ms) e inyecta Alt+F1.
 
-Limitación conocida: cuando FancyMenu está abierto, Qt toma XGrabKeyboard (active grab)
-y el passive grab de XGrabKey no se activa. Por eso Super abre pero no cierra.
+Usa XGrabKey con 8 máscaras de modificadores (como xcape) y struct XKeyEvent
+de 96 bytes para evitar buffer overflow.
+
+Limitación: cuando FancyMenu está abierto, Qt toma XGrabKeyboard (active grab)
+y el passive grab de XGrabKey no se activa. Super abre pero no cierra.
 """
-import ctypes, sys, os, time
+import ctypes, sys, time
 from datetime import datetime
 
 # ── Constants ─────────────────────────────────────────────────────────────
@@ -16,16 +19,42 @@ XK_Super_L, XK_Super_R = 0xffeb, 0xffec
 XK_Alt_L, XK_F1 = 0xffe9, 0xffbe
 TIMEOUT_MS = 500
 
+# All modifier masks: None, Shift, CapsLock, NumLock, Mod2-Mod5
+MODIFIERS = [0, 1, 2, 4, 8, 16, 32, 64]
+
 def log(msg):
     ts = datetime.now().strftime("%H:%M:%S")
     print(f"[lxqt-superkey {ts}] {msg}", file=sys.stderr, flush=True)
+
+# ── XKeyEvent struct — MUST be exactly 96 bytes ───────────────────────────
+class XKeyEvent(ctypes.Structure):
+    _fields_ = [
+        ("type",        ctypes.c_int),       #  0  (4 bytes)
+        ("serial",      ctypes.c_ulong),     #  8  (8 bytes, aligned)
+        ("send_event",  ctypes.c_int),       # 16  (4 bytes)
+        ("display",     ctypes.c_void_p),    # 24  (8 bytes, aligned)
+        ("window",      ctypes.c_ulong),     # 32  (8 bytes)
+        ("root",        ctypes.c_ulong),     # 40  (8 bytes)
+        ("subwindow",   ctypes.c_ulong),     # 48  (8 bytes)
+        ("time",        ctypes.c_ulong),     # 56  (8 bytes)
+        ("x",           ctypes.c_int),       # 64  (4 bytes)
+        ("y",           ctypes.c_int),       # 68  (4 bytes)
+        ("x_root",      ctypes.c_int),       # 72  (4 bytes)
+        ("y_root",      ctypes.c_int),       # 76  (4 bytes)
+        ("state",       ctypes.c_uint),      # 80  (4 bytes)
+        ("keycode",     ctypes.c_uint),      # 84  (4 bytes)
+        ("same_screen", ctypes.c_int),       # 88  (4 bytes)
+        ("_pad",        ctypes.c_ubyte * 4), # 92  (4 bytes → 96 total)
+    ]
+
+assert ctypes.sizeof(XKeyEvent) == 96, f"XKeyEvent size is {ctypes.sizeof(XKeyEvent)}, expected 96"
 
 # ── Error handler ─────────────────────────────────────────────────────────
 ErrorHandler = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p)
 
 @ErrorHandler
 def error_handler(dpy, event):
-    log(f"X11 error (ignored)")
+    log("X11 error (ignored)")
     return 0
 
 def main():
@@ -39,11 +68,9 @@ def main():
         sys.exit(1)
 
     root = x11.XDefaultRootWindow(dpy)
-
-    # Error handler
     x11.XSetErrorHandler(error_handler)
 
-    # Keycodes
+    # ── Keycodes ──────────────────────────────────────────────────────────
     x11.XKeysymToKeycode.restype = ctypes.c_uint
     super_l = x11.XKeysymToKeycode(dpy, XK_Super_L)
     super_r = x11.XKeysymToKeycode(dpy, XK_Super_R)
@@ -52,45 +79,37 @@ def main():
     super_kcs = {super_l, super_r}
     log(f"Super_L={super_l} Super_R={super_r} Alt={alt_kc} F1={f1_kc}")
 
-    # Grab Super keys
-    x11.XGrabKey(dpy, super_l, 0, root, False, GrabModeAsync, GrabModeAsync)
-    x11.XGrabKey(dpy, super_r, 0, root, False, GrabModeAsync, GrabModeAsync)
+    # ── Grab Super with all modifier masks ────────────────────────────────
+    for mod in MODIFIERS:
+        x11.XGrabKey(dpy, super_l, mod, root, False, GrabModeAsync, GrabModeAsync)
+        x11.XGrabKey(dpy, super_r, mod, root, False, GrabModeAsync, GrabModeAsync)
     x11.XSync(dpy, False)
-    log("Super keys grabbed. Waiting for taps...")
+    log("Super keys grabbed (8 mod masks). Waiting for taps...")
 
-    # State
+    # ── State ─────────────────────────────────────────────────────────────
     sp_down = False
     sp_press_time = 0.0
     other_pressed = False
+    generated = set()  # keycodes we injected via XTest
 
-    # Event struct
-    class XEvent(ctypes.Structure):
-        _fields_ = [
-            ("type", ctypes.c_int),
-            ("serial", ctypes.c_ulong),
-            ("send_event", ctypes.c_int),
-            ("display", ctypes.c_void_p),
-            ("window", ctypes.c_ulong),
-            ("pad", ctypes.c_ubyte * 24),
-        ]
+    event = XKeyEvent()
 
-    event = XEvent()
-
+    # ── Main loop ─────────────────────────────────────────────────────────
     while True:
         x11.XNextEvent(dpy, ctypes.byref(event))
-        # KeyPress/KeyRelease: keycode is at byte 1 of the event (offset after type+serial+send_event+display+window)
-        # For XKeyEvent: type(4) + serial(8) + send_event(4) + display(8) + window(8) + root(8) + subwindow(8) + time(8) + x(4)+y(4) + x_root(4)+y_root(4) + state(4) = ~28 bytes before keycode
-        # Actually keycode is at fixed offset. Let's parse it properly.
-        raw = ctypes.string_at(ctypes.byref(event), 96)
-        ev_type = event.type
-        # XKeyEvent layout on 64-bit (ctypes alignment):
-        # type(4) @0, serial(8) @8, send_event(4) @16, display(8) @24, window(8) @32
-        # root(8) @40, subwindow(8) @48, time(8) @56, x(4) @64, y(4) @68
-        # x_root(4) @72, y_root(4) @76, state(4) @80, keycode(4) @84, same_screen(4) @88
-        keycode = raw[84]
 
-        if ev_type == KeyPress:
-            if keycode in super_kcs:
+        if event.type != KeyPress and event.type != KeyRelease:
+            continue
+
+        kc = event.keycode
+
+        # Ignore events we generated ourselves
+        if kc in generated:
+            generated.discard(kc)
+            continue
+
+        if event.type == KeyPress:
+            if kc in super_kcs:
                 if not sp_down:
                     sp_down = True
                     sp_press_time = time.time()
@@ -99,16 +118,20 @@ def main():
                 if sp_down:
                     other_pressed = True
 
-        elif ev_type == KeyRelease:
-            if keycode in super_kcs:
+        elif event.type == KeyRelease:
+            if kc in super_kcs:
                 if sp_down and not other_pressed:
                     elapsed = (time.time() - sp_press_time) * 1000
                     if elapsed < TIMEOUT_MS:
-                        log(f"Super tap ({elapsed:.0f}ms) → Alt+F1")
+                        log(f"Super tap ({elapsed:.0f}ms) -> Alt+F1")
                         xtst.XTestFakeKeyEvent(dpy, alt_kc, True, 0)
+                        generated.add(alt_kc)
                         xtst.XTestFakeKeyEvent(dpy, f1_kc, True, 0)
+                        generated.add(f1_kc)
                         xtst.XTestFakeKeyEvent(dpy, f1_kc, False, 0)
+                        generated.add(f1_kc)
                         xtst.XTestFakeKeyEvent(dpy, alt_kc, False, 0)
+                        generated.add(alt_kc)
                         x11.XFlush(dpy)
                 sp_down = False
                 other_pressed = False
