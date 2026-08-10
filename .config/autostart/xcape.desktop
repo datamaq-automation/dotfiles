@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=Xcape Super Key
-Comment=Mapea la tecla Super a Alt+F1 via XRecord (abre/cierra FancyMenu)
-Exec=xcape -e 'Super_L=Alt_L|F1'
+Name=KSuperKey Super Key
+Comment=Mapea la tecla Super a toggle FancyMenu via D-Bus (XRecord + D-Bus)
+Exec=/home/agustin/.local/bin/ksuperkey -e 'Super_L=Alt_L|F1'
 OnlyShowIn=LXQt;
 X-LXQt-Need-Tray=false
 Enabled=true

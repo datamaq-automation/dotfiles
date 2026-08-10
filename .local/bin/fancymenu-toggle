@@ -1,0 +1,8 @@
+#!/bin/bash
+# Toggle FancyMenu via D-Bus — bypasses X11 keyboard grabs
+# Discover the panel's unique D-Bus name
+PANEL_NAME=$(busctl --user list 2>/dev/null | awk '$3 == "lxqt-panel" {print $1; exit}')
+if [ -z "$PANEL_NAME" ]; then
+    exit 1
+fi
+exec busctl --user call "$PANEL_NAME" /global_key_shortcuts/panel/fancymenu/show_hide org.lxqt.global_key_shortcuts.client activated
