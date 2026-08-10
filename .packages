@@ -5,4 +5,5 @@ xfce4-terminal          # Terminal preferida (reemplaza qterminal)
 xdotool                 # Debugging: simular teclas desde CLI
 screengrab              # Screenshots interactivos
 lxqt-config-brightness  # Control de brillo
+xcape                   # Super key -> Alt+F1 (XRecord, confiable)
 gh                      # GitHub CLI (desde repos oficial)

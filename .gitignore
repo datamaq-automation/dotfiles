@@ -8,8 +8,8 @@
 !README.md
 !.config/
 !.config/autostart/
-!.config/autostart/lxqt-superkey.desktop
 !.config/autostart/plasma-kglobalaccel.desktop
+!.config/autostart/xcape.desktop
 !.config/kwinrc
 !.config/lxqt/
 !.config/lxqt/globalkeyshortcuts.conf
@@ -18,8 +18,6 @@
 !.config/pcmanfm-qt/
 !.config/pcmanfm-qt/lxqt/
 !.config/pcmanfm-qt/lxqt/settings.conf
-!.local/
-!.local/bin/
-!.local/bin/lxqt-superkey
 !Imágenes/
+Imágenes/*
 !Imágenes/wallhaven-486l61.jpg
