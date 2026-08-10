@@ -1,0 +1,8 @@
+# Paquetes instalados manualmente para el setup LXQt
+# Formato: paquete  razón
+
+xfce4-terminal          # Terminal preferida (reemplaza qterminal)
+xdotool                 # Debugging: simular teclas desde CLI
+screengrab              # Screenshots interactivos
+lxqt-config-brightness  # Control de brillo
+gh                      # GitHub CLI (desde repos oficial)

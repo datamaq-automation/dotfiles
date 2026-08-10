@@ -83,14 +83,11 @@ def main():
         # Actually keycode is at fixed offset. Let's parse it properly.
         raw = ctypes.string_at(ctypes.byref(event), 96)
         ev_type = event.type
-        # In XKeyEvent layout on 64-bit:
-        # type(4) serial(8) send_event(4) display(8) window(8) root(8)
-        # subwindow(8) time(8) x(4) y(4) x_root(4) y_root(4) state(4)
-        # keycode(4) same_screen(1) ...
-        # keycode offset = 4+8+4+8+8+8+8+8+4+4+4+4+4 = 72 + 4 (state) = 76
-        # Let's just use the offset empirically.
-        # Actually, simpler: bytes 0-3 = type, ... let me use struct
-        keycode = raw[76]  # empiric offset for keycode in XKeyEvent on 64-bit
+        # XKeyEvent layout on 64-bit (ctypes alignment):
+        # type(4) @0, serial(8) @8, send_event(4) @16, display(8) @24, window(8) @32
+        # root(8) @40, subwindow(8) @48, time(8) @56, x(4) @64, y(4) @68
+        # x_root(4) @72, y_root(4) @76, state(4) @80, keycode(4) @84, same_screen(4) @88
+        keycode = raw[84]
 
         if ev_type == KeyPress:
             if keycode in super_kcs:
