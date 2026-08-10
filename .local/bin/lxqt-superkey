@@ -133,6 +133,7 @@ def main():
                         xtst.XTestFakeKeyEvent(dpy, alt_kc, False, 0)
                         generated.add(alt_kc)
                         x11.XFlush(dpy)
+                        generated.clear()  # XTest events go to globalkeysd, never loop back
                 sp_down = False
                 other_pressed = False
 

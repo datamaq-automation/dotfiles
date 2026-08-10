@@ -3,7 +3,7 @@
 **Fecha:** 9 de Agosto de 2026
 **Usuario:** agustin
 **Entorno:** LXQt / KWin 6.7.2 / PCManFM-Qt (X11)
-**Ubicación del reporte:** `/home/agustin/Desktop/reporte_diagnostico_lxqt.md` (y `/home/agustin/Escritorio/reporte_diagnostico_lxqt.md`)
+**Ubicación del reporte:** `~/README.md` (repo dotfiles)
 
 ---
 

@@ -1,0 +1,23 @@
+# Ignorar TODO por defecto (bare repo con work-tree en $HOME)
+# Solo versionar archivos agregados explícitamente con !patterns
+
+/*
+!.bashrc
+!.gitignore
+!.packages
+!README.md
+!.config/
+!.config/autostart/
+!.config/autostart/lxqt-superkey.desktop
+!.config/autostart/plasma-kglobalaccel.desktop
+!.config/kwinrc
+!.config/lxqt/
+!.config/lxqt/globalkeyshortcuts.conf
+!.config/lxqt/panel.conf
+!.config/lxqt/session.conf
+!.config/pcmanfm-qt/
+!.config/pcmanfm-qt/lxqt/
+!.config/pcmanfm-qt/lxqt/settings.conf
+!.local/
+!.local/bin/
+!.local/bin/lxqt-superkey

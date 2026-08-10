@@ -5,4 +5,4 @@ Comment=Servidor de atajos globales para KWin (Alt+Tab, etc.)
 Exec=systemctl --user start plasma-kglobalaccel.service
 OnlyShowIn=LXQt;
 X-LXQt-Need-Tray=false
-Enabled=false
+Enabled=true
