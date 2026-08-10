@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LXQt Super Key Mapper
+Comment=Mapea la tecla Super (Windows) para abrir el menu Inicio de LXQt
+Exec=/home/agustin/.local/bin/lxqt-superkey
+OnlyShowIn=LXQt;
+X-LXQt-Need-Tray=false
+Enabled=true

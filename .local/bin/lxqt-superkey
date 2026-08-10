@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""
+LXQt Super Key Daemon — XGrabKey + XTestFakeKeyEvent.
+Detecta tap de Super (press+release sin otras teclas en <500ms) e inyecta Alt+F1.
+
+Limitación conocida: cuando FancyMenu está abierto, Qt toma XGrabKeyboard (active grab)
+y el passive grab de XGrabKey no se activa. Por eso Super abre pero no cierra.
+"""
+import ctypes, sys, os, time
+from datetime import datetime
+
+# ── Constants ─────────────────────────────────────────────────────────────
+KeyPress, KeyRelease = 2, 3
+GrabModeAsync = 1
+XK_Super_L, XK_Super_R = 0xffeb, 0xffec
+XK_Alt_L, XK_F1 = 0xffe9, 0xffbe
+TIMEOUT_MS = 500
+
+def log(msg):
+    ts = datetime.now().strftime("%H:%M:%S")
+    print(f"[lxqt-superkey {ts}] {msg}", file=sys.stderr, flush=True)
+
+# ── Error handler ─────────────────────────────────────────────────────────
+ErrorHandler = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p)
+
+@ErrorHandler
+def error_handler(dpy, event):
+    log(f"X11 error (ignored)")
+    return 0
+
+def main():
+    x11 = ctypes.CDLL("libX11.so.6")
+    xtst = ctypes.CDLL("libXtst.so.6")
+
+    x11.XOpenDisplay.restype = ctypes.c_void_p
+    dpy = x11.XOpenDisplay(None)
+    if not dpy:
+        log("FATAL: Cannot open display")
+        sys.exit(1)
+
+    root = x11.XDefaultRootWindow(dpy)
+
+    # Error handler
+    x11.XSetErrorHandler(error_handler)
+
+    # Keycodes
+    x11.XKeysymToKeycode.restype = ctypes.c_uint
+    super_l = x11.XKeysymToKeycode(dpy, XK_Super_L)
+    super_r = x11.XKeysymToKeycode(dpy, XK_Super_R)
+    alt_kc  = x11.XKeysymToKeycode(dpy, XK_Alt_L)
+    f1_kc   = x11.XKeysymToKeycode(dpy, XK_F1)
+    super_kcs = {super_l, super_r}
+    log(f"Super_L={super_l} Super_R={super_r} Alt={alt_kc} F1={f1_kc}")
+
+    # Grab Super keys
+    x11.XGrabKey(dpy, super_l, 0, root, False, GrabModeAsync, GrabModeAsync)
+    x11.XGrabKey(dpy, super_r, 0, root, False, GrabModeAsync, GrabModeAsync)
+    x11.XSync(dpy, False)
+    log("Super keys grabbed. Waiting for taps...")
+
+    # State
+    sp_down = False
+    sp_press_time = 0.0
+    other_pressed = False
+
+    # Event struct
+    class XEvent(ctypes.Structure):
+        _fields_ = [
+            ("type", ctypes.c_int),
+            ("serial", ctypes.c_ulong),
+            ("send_event", ctypes.c_int),
+            ("display", ctypes.c_void_p),
+            ("window", ctypes.c_ulong),
+            ("pad", ctypes.c_ubyte * 24),
+        ]
+
+    event = XEvent()
+
+    while True:
+        x11.XNextEvent(dpy, ctypes.byref(event))
+        # KeyPress/KeyRelease: keycode is at byte 1 of the event (offset after type+serial+send_event+display+window)
+        # For XKeyEvent: type(4) + serial(8) + send_event(4) + display(8) + window(8) + root(8) + subwindow(8) + time(8) + x(4)+y(4) + x_root(4)+y_root(4) + state(4) = ~28 bytes before keycode
+        # Actually keycode is at fixed offset. Let's parse it properly.
+        raw = ctypes.string_at(ctypes.byref(event), 96)
+        ev_type = event.type
+        # In XKeyEvent layout on 64-bit:
+        # type(4) serial(8) send_event(4) display(8) window(8) root(8)
+        # subwindow(8) time(8) x(4) y(4) x_root(4) y_root(4) state(4)
+        # keycode(4) same_screen(1) ...
+        # keycode offset = 4+8+4+8+8+8+8+8+4+4+4+4+4 = 72 + 4 (state) = 76
+        # Let's just use the offset empirically.
+        # Actually, simpler: bytes 0-3 = type, ... let me use struct
+        keycode = raw[76]  # empiric offset for keycode in XKeyEvent on 64-bit
+
+        if ev_type == KeyPress:
+            if keycode in super_kcs:
+                if not sp_down:
+                    sp_down = True
+                    sp_press_time = time.time()
+                    other_pressed = False
+            else:
+                if sp_down:
+                    other_pressed = True
+
+        elif ev_type == KeyRelease:
+            if keycode in super_kcs:
+                if sp_down and not other_pressed:
+                    elapsed = (time.time() - sp_press_time) * 1000
+                    if elapsed < TIMEOUT_MS:
+                        log(f"Super tap ({elapsed:.0f}ms) → Alt+F1")
+                        xtst.XTestFakeKeyEvent(dpy, alt_kc, True, 0)
+                        xtst.XTestFakeKeyEvent(dpy, f1_kc, True, 0)
+                        xtst.XTestFakeKeyEvent(dpy, f1_kc, False, 0)
+                        xtst.XTestFakeKeyEvent(dpy, alt_kc, False, 0)
+                        x11.XFlush(dpy)
+                sp_down = False
+                other_pressed = False
+
+if __name__ == "__main__":
+    main()

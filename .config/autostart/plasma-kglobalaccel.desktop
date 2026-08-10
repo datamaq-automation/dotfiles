@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=KDE Global Shortcuts Server
+Comment=Servidor de atajos globales para KWin (Alt+Tab, etc.)
+Exec=systemctl --user start plasma-kglobalaccel.service
+OnlyShowIn=LXQt;
+X-LXQt-Need-Tray=false
+Enabled=false
