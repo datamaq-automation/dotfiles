@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Firefox
+Icon=firefox-esr
+Exec=/home/agustin/.local/bin/firefox-tab
+Categories=Network;WebBrowser;
+Terminal=false
+StartupNotify=true
+StartupWMClass=firefox-esr

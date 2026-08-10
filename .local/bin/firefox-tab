@@ -1,0 +1,10 @@
+#!/bin/bash
+# Wrapper: si ya hay una ventana de Firefox, la enfoca y abre nueva pestaña.
+# Si no, lanza normalmente.
+
+if wmctrl -l -x | grep -qi 'firefox-esr'; then
+    wmctrl -a 'Firefox'
+    firefox-esr --new-tab about:newtab
+else
+    exec firefox-esr "$@"
+fi

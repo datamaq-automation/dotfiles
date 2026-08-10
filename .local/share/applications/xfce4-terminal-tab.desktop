@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Terminal Xfce
+Icon=org.xfce.terminal
+Exec=/home/agustin/.local/bin/xfce4-terminal-tab
+Categories=GTK;System;TerminalEmulator;
+Terminal=false
+StartupNotify=true

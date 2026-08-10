@@ -24,9 +24,13 @@
 !.local/bin/
 !.local/bin/fancymenu-toggle
 !.local/bin/ksuperkey
+!.local/bin/xfce4-terminal-tab
+!.local/bin/firefox-tab
 !.local/share/
 !.local/share/applications/
 !.local/share/applications/xfce4-taskmanager.desktop
+!.local/share/applications/xfce4-terminal-tab.desktop
+!.local/share/applications/firefox-tab.desktop
 !.local/share/icons/
 !.local/share/icons/Windows-7/
 !Imágenes/

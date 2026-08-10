@@ -1,0 +1,11 @@
+#!/bin/bash
+# Wrapper: si ya hay una ventana de xfce4-terminal, la enfoca y abre nueva pestaña.
+# Si no, lanza normalmente.
+
+if wmctrl -l -x | grep -qi 'xfce4-terminal'; then
+    wmctrl -a 'Terminal'
+    sleep 0.1
+    xfce4-terminal --tab --active-tab
+else
+    exec xfce4-terminal "$@"
+fi
