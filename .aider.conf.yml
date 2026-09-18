@@ -1,0 +1,79 @@
+# ~/.aider.conf.yml (o .aider.conf.yml en el proyecto)
+
+# Modelos locales via Ollama
+model: ollama/qwen2.5-coder:7b
+editor-model: ollama/qwen2.5-coder:7b
+weak-model: ollama/qwen2.5-coder:7b
+
+# Mantener modelo local en RAM permanente (20GB libres)
+extra-params:
+  keep_alive: -1
+
+# Modo Arquitecto Autónomo
+architect: true
+auto-accept-architect: false
+
+# Formato de edición sintáctica ultra-preciso en Diffs
+edit-format: diff
+
+
+# Control de Tokens, Repo-Map e Historial (Filtrado estricto en CPU/RAM local)
+max-chat-history-tokens: 8192
+map-tokens: 1024
+map-multiplier-no-files: 1
+subtree-only: false
+yes-always: true
+
+
+# Prompt Caching & KeepAlive (Ajustado a bloques de 64 tokens de DeepSeek)
+cache-prompts: true
+cache-keepalive-pings: 12
+
+# Gauntlet de Pruebas y Auto-Reparación (Uncle Bob Extreme Constraints + Multiproceso)
+auto-lint: true
+lint-cmd: "ruff check --fix && ruff format"
+auto-test: true
+test-cmd: "[ -f ./scripts/pre-push.sh ] && ./scripts/pre-push.sh || (pytest -n auto -q tests/ 2>/dev/null || pytest -q)"
+
+
+
+# Control de cambios Git atómicos
+auto-commits: true
+attribute-commit-message-author: false
+git: true
+commit-prompt: "Formatea el mensaje de commit siguiendo Conventional Commits (feat, fix, refactor, test, docs, chore). Sé conciso y claro."
+
+# Modos de Terminal y Renderizado
+dark-mode: true
+pretty: true
+fancy-input: true
+suggest-shell-commands: true
+show-diffs: true
+
+# Paleta Hexadecimal de Alto Contraste
+user-input-color: "#00ffaa"
+assistant-output-color: "#f0f6fc"
+tool-output-color: "#8b949e"
+tool-error-color: "#ff7b72"
+tool-warning-color: "#d29922"
+
+# Menú de Autocompletado (/add, /drop, comandos)
+completion-menu-color: "#c9d1d9"
+completion-menu-bg-color: "#161b22"
+completion-menu-current-color: "#ffffff"
+completion-menu-current-bg-color: "#1f6feb"
+
+# Resaltado de Sintaxis Markdown / Diffs
+code-theme: "one-dark"
+
+# Notificaciones y Silenciado de Ruido
+show-release-notes: false
+show-model-warnings: false
+notifications: false
+
+# Registro de Métricas y Registro de Costo de Proveedores
+analytics: true
+analytics-log: ~/.aider/analytics.log
+
+
+
