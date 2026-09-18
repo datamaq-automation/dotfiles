@@ -130,4 +130,101 @@ eval "$(atuin init bash | sed 's/(BASH_VERSINFO\[0\] == 5 && BASH_VERSINFO\[1\] 
 # Reset $_ to avoid dumping the entire init script (~57KB) on first PS0 expansion
 :
 
-alias dotfiles="/usr/bin/git --git-dir=\$HOME/.dotfiles/ --work-tree=\$HOME"
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
+
+# Optimización de Ollama para iGPU AMD Vega 11 (Vulkan RADV)
+export OLLAMA_VULKAN=1
+export HIP_VISIBLE_DEVICES=-1
+export GGML_VK_VISIBLE_DEVICES=0
+export RADV_PERFTEST=nogttspill,aco
+export OLLAMA_NUM_PARALLEL=1
+export OLLAMA_MAX_LOADED_MODELS=1
+export OLLAMA_FLASH_ATTENTION=1
+export OLLAMA_KEEP_ALIVE=24h
+export OLLAMA_NUM_THREADS=8
+
+
+# --- OpenCode resiliente en VPS ---
+# TUI persistente vía tmux auto-reanudable
+alias vps-opencode='ssh -t vps "tmux new -A -s opencode opencode"'
+# Túnel dedicado al daemon 'opencode serve' (puerto 4096)
+alias vps-opencode-daemon='ssh -tNf vps-tunnel'
+# Attach local al agente remoto vía túnel
+alias opencode-attach='opencode attach http://localhost:4096'
+# Attach al daemon remoto con auth (password derivada de la misma key del túnel)
+alias opencode-attach='opencode attach http://localhost:4096 --password "${OPENCODE_SERVER_PASSWORD:-$(env | grep -oE "^DEEPSEEK_API_KEY=.*" | head -1 | cut -d= -f2-)}" --username opencode'
+
+# kimi-code
+export PATH="/home/agustin/.kimi-code/bin:$PATH"
+export PATH="$PATH:/home/agustin/.local/share/pnpm"
+
+# pnpm
+export PNPM_HOME="/home/agustin/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
+
+# --- Invocación Inteligente con Healthcheck y Selección Horaria de Aider ---
+run_aider() {
+  if [ -f "app-datamaq/.git" ] || [ -d "app-datamaq" ]; then
+    local health_out=$(python3 ~/.aider/datamaq_healthcheck.py)
+    local exit_code=$?
+    echo "$health_out"
+    if [ $exit_code -ne 0 ]; then
+      echo -e "\033[1;33m⚠️ Se enviará el reporte de salud como contexto inicial al LLM para diagnóstico...\033[0m"
+      command aider --message "$health_out" "$@"
+      return
+    fi
+  fi
+  
+  # Si no se pasó --model manualmente, seleccionar según horario no pico de DeepSeek
+  if [[ "$*" != *"--model"* ]]; then
+    local auto_model=$(python3 ~/.aider/provider_selector.py)
+    echo -e "\033[1;36m🎯 [Auto-Tarifa]: Usando $auto_model segun ventana horaria DeepSeek.\033[0m"
+    command aider $auto_model "$@"
+    return
+  fi
+
+  command aider "$@"
+}
+
+# --- Alias de Aider por Proveedor ---
+alias aider='run_aider'
+alias aider-auto='run_aider'
+alias aider-deepseek="run_aider --model deepseek/deepseek-chat"
+alias aider-local="run_aider --model ollama/qwen2.5-coder:7b"
+alias aider-local-fast="run_aider --model ollama/qwen2.5-coder:7b --map-tokens 0"
+alias aider-builder="run_aider --model ollama/qwen2.5-coder:1.5b --map-tokens 0"
+alias aider-claude="run_aider --model anthropic/claude-3-7-sonnet-20250219 --editor-model deepseek/deepseek-chat"
+alias aider-architect="run_aider --architect --model anthropic/claude-3-7-sonnet-20250219 --editor-model deepseek/deepseek-chat"
+alias aider-stats="python3 ~/.aider/log_analyzer.py"
+
+# --- Estado Global de Subrepositorios datamaq ---
+datamaq-status() {
+  local repos=("app-datamaq" "datamaq-hub" "datamaq-telemetry" "www-datamaq")
+  local orig_dir="$(pwd)"
+  
+  for repo in "${repos[@]}"; do
+    if [ -d "$orig_dir/$repo/.git" ] || [ -d "$repo/.git" ]; then
+      local target="$repo"
+      [ -d "$orig_dir/$repo/.git" ] && target="$orig_dir/$repo"
+      
+      echo -e "\n======================================================="
+      echo -e "📦 REPOSITORIO: \033[1;34m$repo\033[0m"
+      echo -e "======================================================="
+      (
+        cd "$target" || exit
+        echo -e "\033[1;33m[ Git Status ]\033[0m"
+        git status -s || echo "Sin cambios"
+        
+        echo -e "\n\033[1;36m[ GitHub Actions Runs (Últimas 3) ]\033[0m"
+        gh run list -L 3 2>/dev/null || echo "No se pudo obtener ejecuciones de GitHub Actions"
+      )
+    fi
+  done
+  echo -e "\n=======================================================\n"
+}
+
+

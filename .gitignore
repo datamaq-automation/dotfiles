@@ -6,6 +6,8 @@
 !.gitignore
 !.packages
 !README.md
+!.aider/
+!.aider/**
 !.config/
 !.config/autostart/
 !.config/autostart/plasma-kglobalaccel.desktop
