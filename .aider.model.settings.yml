@@ -1,0 +1,88 @@
+- name: deepseek/deepseek-chat
+  edit_format: diff
+  weak_model_name: deepseek/deepseek-chat
+  use_repo_map: true
+  send_undo_reply: false
+  cache_control: false
+  caches_by_default: true
+  use_system_prompt: true
+  use_temperature: true
+  extra_params:
+    max_tokens: 8192
+    temperature: 0.05
+    top_p: 0.95
+  system_prompt_prefix: |
+    DIRECTIVAS DE SALIDA Y CONCISIÓN:
+    1. Prohibido incluir preámbulos, saludos, cortesías o frases introductorias (ej. "Entendido", "Aquí tienes el código").
+    2. Prohibido parafrasear o repetir la pregunta del usuario.
+    3. Ve directamente a los bloques de edición SEARCH/REPLACE.
+    4. Si se requiere una explicación técnica, redáctala en un máximo de 2 o 3 viñetas breves al final.
+
+- name: deepseek/deepseek-reasoner
+  edit_format: diff
+  weak_model_name: deepseek/deepseek-chat
+  use_repo_map: true
+  send_undo_reply: false
+  cache_control: false
+  caches_by_default: true
+  use_system_prompt: true
+  use_temperature: false
+  streaming: false
+  reasoning_tag: think
+  extra_params:
+    max_tokens: 8192
+  system_prompt_prefix: |
+    DIRECTIVAS PARA ROL DE ARQUITECTO:
+    1. Mantén tu razonamiento interno estrictamente dentro del canal de pensamiento (<think>).
+    2. En el buffer de salida pública, NO agregues reflexiones meta ni explicaciones conversacionales.
+    3. Presenta únicamente el plan de implementación estructurado con pasos numerados y especificación exacta de archivos y funciones a modificar.
+
+- name: openai/deepseek-chat
+  edit_format: diff
+  weak_model_name: openai/deepseek-chat
+  use_repo_map: true
+  send_undo_reply: false
+  cache_control: false
+  caches_by_default: true
+  use_system_prompt: true
+  use_temperature: true
+  extra_params:
+    max_tokens: 8192
+    temperature: 0.05
+    top_p: 0.95
+
+- name: ollama/qwen2.5-coder:1.5b
+  edit_format: diff
+  weak_model_name: ollama/qwen2.5-coder:1.5b
+  use_repo_map: false
+  use_system_prompt: true
+  use_temperature: true
+  extra_params:
+    max_tokens: 2048
+    temperature: 0.0
+    top_p: 0.9
+  system_prompt_prefix: |
+    DIRECTIVAS PARA MODELO SLM BUILDER LOCAL:
+    1. Responde ÚNICAMENTE con bloques de edición SEARCH/REPLACE concisos.
+    2. Prohibido preámbulos, saludos, explicaciones o texto conversacional.
+    3. Cada bloque SEARCH debe ser de 3 a 5 líneas como máximo.
+    4. Limita tu salida estrictamente a los cambios solicitados para evitar bucles.
+
+- name: ollama/qwen2.5-coder:7b
+  edit_format: diff
+  weak_model_name: ollama/qwen2.5-coder:7b
+  use_repo_map: false
+  use_system_prompt: true
+  use_temperature: true
+  extra_params:
+    max_tokens: 4096
+    temperature: 0.0
+    top_p: 0.9
+  system_prompt_prefix: |
+    DIRECTIVAS PARA MODELO SLM LOCAL:
+    1. Responde directamente con bloques SEARCH/REPLACE concisos.
+    2. Prohibido texto conversacional, preámbulos o resúmenes extensos.
+    3. Cero divagaciones: aplica las modificaciones solicitadas con precisión quirúrgica.
+
+
+

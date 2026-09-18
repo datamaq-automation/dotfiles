@@ -64,3 +64,23 @@ El servicio systemd (`/etc/systemd/system/ollama.service.d/igpu.conf`) ya cuenta
 * **Situación:** El driver Mesa RADV de Linux soporta Vulkan de forma sólida en AMD Vega.
 * **Alternativa:** En vez de pasar por ROCm, `llama.cpp` / `llama-server` compilado con `-DGGML_VULKAN=ON` puede aprovechar la GPU integrada y los 32 GB de memoria compartida directamente.
 * **Prueba futura recomendada:** Correr `llama-server` con backend Vulkan y conectar Aider vía API OpenAI local (`http://localhost:8080/v1`).
+
+---
+
+## 4. Cuello de Botella de Memoria vs Cómputo (CPU al 35%)
+
+### ¿Por qué la CPU parece "subutilizada" durante la generación?
+La inferencia de modelos de lenguaje tiene dos fases con dinámicas de hardware totalmente distintas:
+1. **Prompt Evaluation (Prefill):** Procesa el texto de entrada en paralelo. Es una tarea orientada al cómputo (*compute-bound*). La CPU puede aprovechar todos los hilos del Ryzen (100% de uso) aplicando instrucciones vectoriales AVX2.
+2. **Generación Token a Token (Eval):** Es estrictamente secuencial y orientada a memoria (*memory-bound*). Para generar 1 solo token, la CPU debe transferir todos los pesos del modelo desde la memoria RAM física (DDR4 ~30 GB/s) a la caché del procesador. El procesador pasa la mayor parte de los ciclos de reloj esperando los datos de la RAM, lo que se traduce en un uso aparente de CPU del 30–40%.
+
+### Guardarraíl contra Bucles en SLMs Pequeños
+Los modelos ultraligeros como `1.5B` tienen un límite de atención estructural: no pueden coordinar más de 2 o 3 bloques de diff simultáneos. Si se les solicita modificar 13 llamadas dispersas en 350 líneas de código, entran en bucles autorregresivos infinitos.
+Para evitar esto, se configuró en `~/.aider.model.settings.yml`:
+- `max_tokens: 2048` (corte automático de seguridad para 1.5B).
+- `temperature: 0.0` (determinismo estricto).
+- Directiva de salida concisa en el system prompt.
+
+### Duda 3: Paso de `num_predict` / `max_tokens` en el driver de Ollama
+* **Punto a validar:** Verificar si el cliente de LiteLLM/Aider traduce correctamente `max_tokens` al parámetro `num_predict` de la API de Ollama cuando no se usa la API de OpenAI emulation (`/v1`). Si Ollama ignora `max_tokens`, el límite debe forzarse mediante un Modelfile local (`PARAMETER num_predict 2048`).
+

@@ -8,6 +8,8 @@
 !README.md
 !.aider/
 !.aider/**
+!.aider.conf.yml
+!.aider.model.settings.yml
 !.config/
 !.config/autostart/
 !.config/autostart/plasma-kglobalaccel.desktop
