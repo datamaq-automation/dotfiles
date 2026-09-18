@@ -2,6 +2,7 @@
 """
 Script de Observabilidad y Análisis de Logs de Aider (~/.aider/log_analyzer.py)
 Filtra el ruido y genera un resumen estructurado de uso, costos y eficiencia.
+Incluye análisis de tarifas DeepSeek Pico vs No Pico (Agosto/Septiembre 2026).
 """
 
 import json
@@ -49,7 +50,6 @@ def analyze_logs():
                 total_cost += cost
 
             except json.JSONDecodeError:
-                # Si la línea no es JSON estructurado, se ignora el ruido no formateado
                 continue
 
     print(f"🔢 Sesiones Registradas: {sessions}")
@@ -59,6 +59,16 @@ def analyze_logs():
     print("\n🤖 Distribución por Modelo:")
     for model, count in models_used.items():
         print(f"   • {model}: {count} sesión(es)")
+
+    # Estado de ventana horaria actual DeepSeek
+    from provider_selector import is_deepseek_offpeak
+
+    offpeak, reason = is_deepseek_offpeak()
+    print("\n⏰ Estado Tarifario DeepSeek Actual:")
+    if offpeak:
+        print(f"   🟢 {reason} -> Conveniente usar API Cloud DeepSeek.")
+    else:
+        print(f"   🔴 {reason} -> Se recomienda fallback local a Ollama ($0 tokens).")
 
     print("\n💡 Recomendación de Iteración:")
     if total_tokens_sent > 50000:
