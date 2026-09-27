@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=ZapZap
+Exec=flatpak run com.rtosta.zapzap
+Icon=com.rtosta.zapzap
+Categories=Network;InstantMessaging;
+Hidden=false
+Terminal=false
+StartupNotify=true
+NoDisplay=false

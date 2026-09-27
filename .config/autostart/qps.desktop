@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=QPS
+Exec=qps -mini
+Icon=utilities-system-monitor
+Categories=System;Utility;
+Hidden=false
+Terminal=false
+StartupNotify=true
+NoDisplay=false
