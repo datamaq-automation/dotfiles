@@ -1,0 +1,9 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<channel name="xfce4-terminal" version="1.0">
+  <property name="misc-show-unsafe-paste-dialog" type="bool" value="false"/>
+  <property name="misc-copy-on-select" type="bool" value="true"/>
+  <property name="misc-confirm-close" type="bool" value="false"/>
+  <property name="font-use-system" type="bool" value="false"/>
+  <property name="font-name" type="string" value="DejaVu Sans Mono 10"/>
+</channel>

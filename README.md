@@ -236,3 +236,30 @@ O cerrar y reabrir sesión.
 - [ ] Super cierra FancyMenu (problema potencial: mismo bug de XGrabKeyboard que afectaba al daemon)
 - [ ] Alt+F1 físico sigue funcionando como respaldo
 - [ ] El daemon `lxqt-superkey` ya no es necesario y puede desactivarse en autostart
+
+## 8. Corrección de Espaciado Anormal en Terminal (VTE Grid Spacing bajo LXQt) (1-oct-2026)
+
+### 8.1 Síntoma
+En `xfce4-terminal`, se observó una separación exagerada entre caracteres (letras con espaciado anormalmente ancho excepto caracteres anchos como la "m").
+
+### 8.2 Causa Raíz
+1. **Tipografía proporcional heredada:** El tema Windows 7 en LXQt configuró `gtk-font-name = Segoe UI 9` en `~/.config/gtk-3.0/settings.ini` y `~/.config/lxqt/lxqt.conf`.
+2. **Ausencia de directiva monoespaciada:** No existía `gtk-monospace-font-name` en la configuración de GTK 3 ni GTK 4.
+3. **Cálculo de grilla fija en VTE:** Al tener `font-use-system = true`, `xfce4-terminal` heredó `Segoe UI`. El motor VTE dimensionó las celdas de cuadrícula fija basándose en el glifo más ancho ("m"), generando espacios en blanco anormales alrededor de los caracteres angostos.
+4. **Daemon singleton persistente:** `xfce4-terminal` opera como servidor único (`org.xfce.Terminal5`). Las nuevas ventanas creadas desde el entorno simplemente solicitan una nueva ventana al daemon en ejecución. Al reiniciarse `xfconfd`, el daemon anterior quedó desconectado del bus de propiedades de xfconf hasta que se actualizó mediante el diálogo de Preferencias de la GUI o mediante `--disable-server`.
+
+### 8.3 Solución Aplicada
+1. **Fallback monoespaciado en GTK 3 y GTK 4:**
+   - `~/.config/gtk-3.0/settings.ini` y `~/.config/gtk-4.0/settings.ini`:
+     ```ini
+     gtk-monospace-font-name=DejaVu Sans Mono 10
+     ```
+   - GSettings:
+     ```bash
+     gsettings set org.gnome.desktop.interface monospace-font-name 'DejaVu Sans Mono 10'
+     ```
+2. **Configuración explícita en Xfconf (`xfce4-terminal`):**
+   - `~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-terminal.xml`:
+     - `/font-use-system` = `false`
+     - `/font-name` = `DejaVu Sans Mono 10`
+3. **Recarga:** En instancias activas sin señal D-Bus, abrir `Preferencias -> Aspecto` para refrescar el singleton en memoria, o lanzar con `xfce4-terminal --disable-server`.
