@@ -20,21 +20,17 @@ get_wifi() {
         fi
     fi
 
-    # Si no hay conexión WiFi, retornar estado offline
-    echo "offline"
     return 1
 }
 
 ssid=$(get_wifi 2>/dev/null)
 
-case "$ssid" in
-    "offline")
-        echo "#[fg=#e06c75]📡 disconnected"
-        ;;
-    "")
-        echo "#[fg=#e06c75]📡 unknown"
-        ;;
-    *)
-        echo "#[fg=#61afef]📡 $ssid"
-        ;;
-esac
+if [ -n "$ssid" ]; then
+    # Truncar SSID si es muy largo (máx 15 caracteres)
+    if [ ${#ssid} -gt 15 ]; then
+        ssid="${ssid:0:12}..."
+    fi
+    echo "#[fg=#61afef]$ssid"
+else
+    echo "#[fg=#e06c75]⚠"
+fi
