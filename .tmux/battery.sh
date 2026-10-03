@@ -6,9 +6,22 @@ get_battery_info() {
         if [ -r "$bat/capacity" ] && [ -r "$bat/status" ]; then
             capacity=$(cat "$bat/capacity")
             status=$(cat "$bat/status")
-            energy_now=$(cat "$bat/energy_now" 2>/dev/null || echo "0")
-            energy_full=$(cat "$bat/energy_full" 2>/dev/null || echo "0")
-            power_now=$(cat "$bat/power_now" 2>/dev/null || echo "1")
+
+            # Intentar leer energy_now/energy_full primero
+            if [ -r "$bat/energy_now" ] && [ -r "$bat/energy_full" ]; then
+                energy_now=$(cat "$bat/energy_now")
+                energy_full=$(cat "$bat/energy_full")
+                power_now=$(cat "$bat/power_now" 2>/dev/null || echo "0")
+            # Si no, intentar con charge_now/charge_full
+            elif [ -r "$bat/charge_now" ] && [ -r "$bat/charge_full" ]; then
+                energy_now=$(cat "$bat/charge_now")
+                energy_full=$(cat "$bat/charge_full")
+                power_now=$(cat "$bat/current_now" 2>/dev/null || echo "0")
+            else
+                echo "0:$status:0:0:0"
+                return 0
+            fi
+
             echo "$capacity:$status:$energy_now:$energy_full:$power_now"
             return 0
         fi
@@ -22,7 +35,10 @@ calculate_time() {
     local power_now=$3
     local status=$4
 
-    [ "$power_now" -eq 0 ] && echo "0h 0m" && return
+    if [ "$power_now" -eq 0 ] 2>/dev/null; then
+        echo "0h 0m"
+        return
+    fi
 
     local energy_remaining
     if [ "$status" = "Discharging" ]; then
@@ -31,9 +47,12 @@ calculate_time() {
         energy_remaining=$((energy_full - energy_now))
     fi
 
-    local minutes=$(( energy_remaining / power_now ))
+    # Calcular minutos usando awk para evitar pérdida en división entera
+    # time_horas = energy / power, entonces time_minutos = (energy / power) * 60
+    local minutes=$(awk "BEGIN {printf \"%.0f\", ($energy_remaining / $power_now) * 60}")
     local hours=$(( minutes / 60 ))
     local mins=$(( minutes % 60 ))
+
     printf "%dh %dm" "$hours" "$mins"
 }
 
