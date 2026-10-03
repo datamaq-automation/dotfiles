@@ -20,9 +20,9 @@ status=$(check_internet 2>/dev/null)
 
 case "$status" in
     "online")
-        echo "#[fg=#98c379]●"
+        echo "#[fg=#98c379]online"
         ;;
     *)
-        echo "#[fg=#e06c75]●"
+        echo "#[fg=#e06c75]offline"
         ;;
 esac
