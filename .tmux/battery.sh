@@ -36,7 +36,7 @@ calculate_time() {
     local status=$4
 
     if [ "$power_now" -eq 0 ] 2>/dev/null; then
-        echo "0h 0m"
+        echo "0m"
         return
     fi
 
@@ -48,12 +48,8 @@ calculate_time() {
     fi
 
     # Calcular minutos usando awk para evitar pérdida en división entera
-    # time_horas = energy / power, entonces time_minutos = (energy / power) * 60
     local minutes=$(awk "BEGIN {printf \"%.0f\", ($energy_remaining / $power_now) * 60}")
-    local hours=$(( minutes / 60 ))
-    local mins=$(( minutes % 60 ))
-
-    printf "%dh %dm" "$hours" "$mins"
+    printf "%dm" "$minutes"
 }
 
 info=$(get_battery_info 2>/dev/null) || exit 0
