@@ -1,29 +1,28 @@
-// Configuración de Zelij
+// Configuración mínima de Zelij
 
 keybinds clear-defaults=true {
     normal {
-        // Navegar panes con Alt+Flechas
         bind "Alt Left" { MoveFocus "Left"; }
         bind "Alt Right" { MoveFocus "Right"; }
         bind "Alt Up" { MoveFocus "Up"; }
         bind "Alt Down" { MoveFocus "Down"; }
 
-        // Navegar windows con Alt+H/L
         bind "Alt h" { GoToPreviousTab; }
         bind "Alt l" { GoToNextTab; }
 
-        // Crear splits con Alt+|/-
+        bind "Alt n" { NewTab; }
+        bind "Alt x" { CloseTab; }
+
         bind "Alt |" { NewPane "Right"; }
         bind "Alt -" { NewPane "Down"; }
 
-        // Redimensionar panes
-        bind "Alt +" { Resize "Increase"; }
-        bind "Alt _" { Resize "Decrease"; }
+        bind "Alt q" { ToggleFocusFullscreen; }
+        bind "Alt d" { Detach; }
     }
 }
 
 themes {
-    dark {
+    default {
         fg 224 224 224
         bg 30 30 30
         black 62 68 66
@@ -38,21 +37,8 @@ themes {
     }
 }
 
-theme "dark"
+theme "default"
 
-ui {
-    pane_frames {
-        rounded_corners true
-        hide_session_name true
-    }
-}
-
-// Modo mouse
 mouse {
     mode true
 }
-
-// Plugins (comentados por defecto)
-// plugins {
-//     tab-bar { }
-// }
