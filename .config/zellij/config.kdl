@@ -12,23 +12,13 @@ keybinds clear-defaults=true {
         bind "Alt h" { GoToPreviousTab; }
         bind "Alt l" { GoToNextTab; }
 
-        // Crear splits
+        // Crear splits con Alt+|/-
         bind "Alt |" { NewPane "Right"; }
         bind "Alt -" { NewPane "Down"; }
 
-        // Redimensionar panes con Ctrl+Flechas
-        bind "Ctrl Left" { Resize "Left" 5; }
-        bind "Ctrl Right" { Resize "Right" 5; }
-        bind "Ctrl Up" { Resize "Up" 5; }
-        bind "Ctrl Down" { Resize "Down" 5; }
-
-        // Prefix: Ctrl+A
-        bind "Ctrl a" {
-            LaunchOrFocusPlugin "zellij:tab-bar";
-        }
-
-        // Reload config
-        bind "Ctrl a r" { SwitchToMode "Normal"; }
+        // Redimensionar panes
+        bind "Alt +" { Resize "Increase"; }
+        bind "Alt _" { Resize "Decrease"; }
     }
 }
 
