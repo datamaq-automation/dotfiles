@@ -52,9 +52,7 @@ mouse {
     mode true
 }
 
-// Plugins
-plugins {
-    tab-bar { }
-    strider { }
-    compact-bar { }
-}
+// Plugins (comentados por defecto)
+// plugins {
+//     tab-bar { }
+// }
