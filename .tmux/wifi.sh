@@ -30,7 +30,7 @@ if [ -n "$ssid" ]; then
     if [ ${#ssid} -gt 15 ]; then
         ssid="${ssid:0:12}..."
     fi
-    echo "#[fg=#61afef]$ssid"
+    echo "#[fg=#98c379]$ssid"
 else
-    echo "#[fg=#e06c75]⚠"
+    echo "#[fg=#e06c75]offline"
 fi

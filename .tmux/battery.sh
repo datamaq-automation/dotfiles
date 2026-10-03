@@ -69,9 +69,9 @@ case "$status" in
         echo "#[fg=#e06c75]⬇ ${capacity}% (${time_str})"
         ;;
     "Full"|"Not charging")
-        echo "#[fg=#61afef]= ${capacity}%"
+        echo "#[fg=#56b6c2]= ${capacity}%"
         ;;
     *)
-        echo "#[fg=#abb2bf]? ${capacity}% (${time_str})"
+        echo "#[fg=#56b6c2]? ${capacity}% (${time_str})"
         ;;
 esac
