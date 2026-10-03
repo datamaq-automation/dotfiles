@@ -63,15 +63,15 @@ time_str=$(calculate_time "$energy_now" "$energy_full" "$power_now" "$status")
 
 case "$status" in
     "Charging")
-        echo "#[fg=#98c379]⬆ ${capacity}% (${time_str})"
+        echo "#[fg=#98c379]+${capacity}% ${time_str}"
         ;;
     "Discharging")
-        echo "#[fg=#e06c75]⬇ ${capacity}% (${time_str})"
+        echo "#[fg=#e06c75]-${capacity}% ${time_str}"
         ;;
     "Full"|"Not charging")
-        echo "#[fg=#56b6c2]= ${capacity}%"
+        echo "#[fg=#56b6c2]=${capacity}%"
         ;;
     *)
-        echo "#[fg=#56b6c2]? ${capacity}% (${time_str})"
+        echo "#[fg=#56b6c2]?${capacity}% ${time_str}"
         ;;
 esac

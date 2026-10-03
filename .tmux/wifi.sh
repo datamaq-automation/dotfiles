@@ -30,7 +30,7 @@ if [ -n "$ssid" ]; then
     # Eliminar caracteres del lado izquierdo (inicio) del nombre
     if [ ${#ssid} -gt 15 ]; then
         # Mostrar últimos 12 caracteres + "..."
-        ssid="...${ssid: -12}"
+        ssid="...$(echo "$ssid" | rev | cut -c1-12 | rev)"
     fi
     echo "#[fg=#98c379]$ssid"
 else
