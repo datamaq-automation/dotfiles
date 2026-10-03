@@ -27,8 +27,10 @@ ssid=$(get_wifi 2>/dev/null)
 
 if [ -n "$ssid" ]; then
     # Truncar SSID si es muy largo (máx 15 caracteres)
+    # Eliminar caracteres del lado izquierdo (inicio) del nombre
     if [ ${#ssid} -gt 15 ]; then
-        ssid="${ssid:0:12}..."
+        # Mostrar últimos 12 caracteres + "..."
+        ssid="...${ssid: -12}"
     fi
     echo "#[fg=#98c379]$ssid"
 else
