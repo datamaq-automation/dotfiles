@@ -121,12 +121,15 @@ terminos
 
 ```bash
 # Saltar o crear una sesión TMUX basada en directorios frecuentes de zoxide
+tz                     # Abre selector interactivo (FZF) de tus proyectos
 tz dotfiles            # Crea o conmuta a sesión 'dotfiles' en ~/proyectos_software/dotfiles
-tz mi-proyecto         # Busca en zoxide y conecta directamente
-j dotfiles             # Alias ultracorto para saltar con zoxide
+j dotfiles             # Salto directo con zoxide
+cd dotfiles            # Salto inteligente automático (cd interceptado por zoxide)
+cdi / zi               # Búsqueda difusa interactiva de carpetas con FZF
 ```
 
 **Atajos y Flujo dentro de TMUX**:
+- `Ctrl+A Ctrl+F` — Abre un popup flotante con **FZF** para buscar y conmutar proyectos instantáneamente.
 - `Ctrl+R` — Abre **Atuin** en una ventana emergente flotante (*popup*) sin ensuciar la terminal.
 - `Flecha Arriba (↑)` — Busca comandos restringidos **exclusivamente a la sesión actual**.
 - `Ctrl+A Ctrl+T` — Despliega una terminal flotante temporal (*scratchpad popup*).

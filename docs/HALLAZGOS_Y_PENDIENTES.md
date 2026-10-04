@@ -32,21 +32,21 @@ Documento de auditoría técnica, decisiones de diseño y hoja de ruta para la o
 
 ---
 
-## 2. Dudas y Decisiones Abiertas
+## 2. Decisiones de Diseño y Estado
 
-| # | Área | Duda / Decisión | Opciones en Consideración |
-|---|------|-----------------|---------------------------|
-| **D1** | **Zoxide** | ¿Intercepción automática de `cd`? | **A:** `eval "$(zoxide init bash --cmd cd)"` para que todo `cd` alimente zoxide.<br>**B:** Mantener `cd` nativo y usar alias cortos (`z`, `j`). |
-| **D2** | **FZF** | ¿Instalar buscador interactivo `fzf`? | **A:** Instalar vía `apt` (requiere sudo).<br>**B:** Descargar binario estático directo a `~/.local/bin/fzf` (sin root ni sudo).<br>**C:** Prescindir de `fzf` y operar zoxide de forma determinista por argumentos. |
-| **D3** | **TMUX Config** | ¿Unificación de `.tmux.conf`? | **A:** Actualizar el archivo versionado en este repositorio con la versión moderna de `~/.tmux.conf`.<br>**B:** Mantener el layout de 3 paneles como perfil educativo y documentar las diferencias. |
-| **D4** | **Multi-host** | Estrategia futura para Laptop vs Desktop | **A:** Ramas separadas permanentes (`master` = laptop, `main` = desktop).<br>**B:** Migrar a futuro a un esquema modular unificado con **GNU Stow** (`dotfiles/common/`, `dotfiles/hosts/laptop/`, `dotfiles/hosts/desktop/`). |
-| **D5** | **Laptop (Heredadas)** | 6 dudas registradas en `origin/master:PENDIENTES.md` | Confirmar en la laptop: utilidad de `qlipper`, `wasistlos`, `xclip`, `wmctrl`, necesidad de `firmware-*` y método de autenticación GitHub con Falkon. |
+| # | Área | Decisión | Estado y Resolución |
+|---|------|----------|---------------------|
+| **D1** | **Zoxide** | Intercepción automática de `cd` | **Resuelta:** Aplicado `eval "$(zoxide init bash --cmd cd)"` en `~/.bashrc`. Aprendizaje transparente y `cdi` habilitado. |
+| **D2** | **FZF** | Buscador interactivo difuso | **Resuelta:** Instalado binario oficial v0.74.4 en `~/.local/bin/fzf` (sin requerir root/sudo). `zi` y popup de `tz` operativos. |
+| **D3** | **TMUX Config** | Unificación de `.tmux.conf` | **Resuelta:** Se portaron las optimizaciones de latencia (`escape-time 10`), True Color, focus-events y popups a ambos archivos conservando la flexibilidad de layouts. |
+| **D4** | **Multi-host** | Estrategia Laptop vs Desktop | **Resuelta:** Ramas separadas en el mismo repo remoto (`master` = laptop, `main` = desktop). |
+| **D5** | **Laptop** | Tareas heredadas en `origin/master:PENDIENTES.md` | **Resuelta:** Reservadas exclusivamente para cuando se opere en el entorno físico de la laptop. |
 
 ---
 
-## 3. Tareas por Hacer (Backlog Priorizado)
+## 3. Tareas por Hacer (Backlog)
 
-### Fase 1: Optimización de TMUX (Inmediata / Sin riesgos)
+### Fase 1: Optimización de TMUX (Completada al 100%)
 - [x] Configurar `escape-time 10` en `~/.tmux.conf` para eliminar lag en modo Vi / Neovim.
 - [x] Configurar `set -as terminal-features ",xterm-256color:RGB"` y `default-terminal "tmux-256color"` para True Color.
 - [x] Habilitar `set -g focus-events on`.
@@ -54,21 +54,23 @@ Documento de auditoría técnica, decisiones de diseño y hoja de ruta para la o
 - [x] Completar keybindings de vi-mode en selección visual (`v` y `Ctrl+V`).
 - [x] Condicionar o remover la llamada a `battery.sh` en la status bar si no existe batería de hardware.
 - [x] Configurar `bind c new-window -c "#{pane_current_path}"` para preservar el directorio al abrir ventanas.
+- [x] Añadir binding `Ctrl+A Ctrl+T` para terminal flotante (*scratchpad popup*).
+- [x] Añadir binding `Ctrl+A Ctrl+F` para selector interactivo de proyectos (*fzf sessionizer popup*).
 
-### Fase 2: Optimización de Atuin (Inmediata / Sin riesgos)
+### Fase 2: Optimización de Atuin (Completada al 100%)
 - [x] Habilitar `[tmux] enabled = true`, `width = "85%"`, `height = "65%"` en `~/.config/atuin/config.toml`.
 - [x] Configurar `search_mode = "fuzzy"`.
 - [x] Configurar `filter_mode_shell_up_key_binding = "session"` (la flecha arriba busca en el contexto de la sesión actual de TMUX).
 - [x] Activar `style = "compact"` y `show_preview = true`.
 
-### Fase 3: Integración Zoxide + TMUX (Sinergia del Trío)
-- [ ] *(Duda D1 - Requiere decisión)* Evaluar y aplicar `eval "$(zoxide init bash --cmd cd)"` en `~/.bashrc`.
+### Fase 3: Integración Zoxide + TMUX + FZF (Completada al 100%)
+- [x] Intercepción transparente de `cd` con `eval "$(zoxide init bash --cmd cd)"` en `~/.bashrc`.
+- [x] Instalar binario oficial `fzf` en `~/.local/bin/fzf`.
 - [x] Agregar alias `alias j="z"` en `~/.bash_aliases`.
-- [x] Implementar la función `tz()` (*TMUX-Zoxide Sessionizer*) en ↗ [~/.bash_aliases](file:///home/agustin/.bash_aliases) y en ↗ [.bash_aliases.public](file:///home/agustin/proyectos_software/dotfiles/.bash_aliases.public).
-- [ ] *(Duda D2 - Requiere decisión)* Instalar o descargar `fzf` en `~/.local/bin/fzf` para desbloquear `zi` y selectores interactivos flotantes en TMUX.
+- [x] Implementar la función `tz()` (*TMUX-Zoxide Sessionizer*) con soporte de picker interactivo en ↗ [~/.bash_aliases](file:///home/agustin/.bash_aliases) y en ↗ [.bash_aliases.public](file:///home/agustin/proyectos_software/dotfiles/.bash_aliases.public).
 
-### Fase 4: Limpieza y Mantenimiento del Repositorio
+### Fase 4: Limpieza y Mantenimiento del Repositorio (Completada al 100%)
 - [x] Reemplazar placeholder `<repo>` por `https://github.com/datamaq-automation/dotfiles.git` en ↗ [INSTALL.md](file:///home/agustin/proyectos_software/dotfiles/INSTALL.md#L17).
-- [x] Unificar el `.tmux.conf` del repositorio con las mejoras de rendimiento aplicadas en `~/.tmux.conf`.
-- [x] Documentar en ↗ [README.md](file:///home/agustin/proyectos_software/dotfiles/README.md) el uso conjunto de TMUX, Atuin y Zoxide.
+- [x] Unificar optimizaciones de rendimiento y popups en ↗ [.tmux.conf](file:///home/agustin/proyectos_software/dotfiles/.tmux.conf).
+- [x] Documentar en ↗ [README.md](file:///home/agustin/proyectos_software/dotfiles/README.md) el uso conjunto de TMUX, Atuin, Zoxide y FZF.
 - [x] Commit y push a `origin/main`.

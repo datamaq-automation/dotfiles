@@ -82,7 +82,7 @@ tmux-attach() {
 # Alias ultracorto para zoxide
 alias j="z"
 
-# TMUX-Zoxide Sessionizer: salta o crea una sesión TMUX basada en zoxide
+# TMUX-Zoxide Sessionizer: salta o crea una sesión TMUX basada en zoxide (con selector interactivo fzf)
 tz() {
     local target
     if [ -n "$1" ]; then
@@ -90,9 +90,15 @@ tz() {
         if [ -z "$target" ] && [ -d "$1" ]; then
             target=$(realpath "$1")
         fi
-    fi
-    if [ -z "$target" ]; then
+    elif command -v fzf >/dev/null 2>&1; then
+        target=$(zoxide query -l 2>/dev/null | fzf --reverse --height=40% --prompt="📁 TMUX Project > ")
+        [ -z "$target" ] && return 0
+    else
         target=$(pwd)
+    fi
+
+    if [ -z "$target" ]; then
+        return 0
     fi
 
     local session_name
