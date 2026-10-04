@@ -121,7 +121,7 @@ Muestra tabla de términos correctos (TTY vs DISPLAY, instanciar vs "abrir", etc
 ## 📚 Documentación
 
 - **[INSTALL.md](INSTALL.md)** — Instalación paso a paso, FAQ
-- **[LANGUAGE.md](docs/LANGUAGE.md)** — Referencia técnica completa (X11, Wayland, TTY, etc)
+- **[LANGUAGE.md](docs/LANGUAGE.md)** — Referencia técnica completa (X11, Wayland, TTY, TMUX, Neovim)
 
 ## 🎓 Para Estudiantes
 
