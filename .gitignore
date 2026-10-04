@@ -24,6 +24,10 @@
 !.config/pcmanfm-qt/
 !.config/pcmanfm-qt/lxqt/
 !.config/pcmanfm-qt/lxqt/settings.conf
+# Ignorar explícitamente estos archivos (contienen secretos/configs personales)
+.bash_aliases
+.tmux.conf
+.config/nvim/
 !.local/
 !.local/bin/
 !.local/bin/fancymenu-toggle
