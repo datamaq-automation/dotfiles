@@ -1,0 +1,44 @@
+// Configuración mínima de Zelij
+
+keybinds clear-defaults=true {
+    normal {
+        bind "Alt Left" { MoveFocus "Left"; }
+        bind "Alt Right" { MoveFocus "Right"; }
+        bind "Alt Up" { MoveFocus "Up"; }
+        bind "Alt Down" { MoveFocus "Down"; }
+
+        bind "Alt h" { GoToPreviousTab; }
+        bind "Alt l" { GoToNextTab; }
+
+        bind "Alt n" { NewTab; }
+        bind "Alt x" { CloseTab; }
+
+        bind "Alt |" { NewPane "Right"; }
+        bind "Alt -" { NewPane "Down"; }
+
+        bind "Alt q" { ToggleFocusFullscreen; }
+        bind "Alt d" { Detach; }
+    }
+}
+
+themes {
+    default {
+        fg 224 224 224
+        bg 30 30 30
+        black 62 68 66
+        red 224 107 117
+        green 152 195 121
+        yellow 184 187 38
+        blue 97 175 239
+        magenta 198 120 221
+        cyan 86 182 194
+        white 224 224 224
+        orange 184 138 66
+    }
+}
+
+theme "default"
+
+mouse {
+    mode true
+}

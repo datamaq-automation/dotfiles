@@ -1,0 +1,20 @@
+layout {
+    pane size=1 borderless=true {
+        plugin location="zellij:status-bar" {
+            mode_info true
+            command_at_launch {
+                LaunchOrFocusPlugin "zellij:compact-bar" {
+                    tab_name_prefix "";
+                };
+            }
+        }
+    }
+    pane {
+        pane {
+        }
+    }
+    pane size=1 borderless=true {
+        plugin location="file:/home/agustin/.config/zellij/plugins/system-info.kdl" {
+        }
+    }
+}
