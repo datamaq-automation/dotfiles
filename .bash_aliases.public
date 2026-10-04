@@ -1,0 +1,131 @@
+# ==============================================================================
+# BASH ALIASES - Utilidades para CLI, TMUX, Neovim y Firefox
+# ==============================================================================
+# Para usar: cp .bash_aliases.public ~/.bash_aliases
+# O agregar al final de ~/.bashrc:
+#   if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases; fi
+# ==============================================================================
+
+# ==============================================================================
+# FIREFOX & X11 - Lanzar navegador desde CLI/TTY
+# ==============================================================================
+
+# Detectar DISPLAY activo (X11 o Wayland)
+get_display() {
+    if [ -n "$DISPLAY" ]; then
+        echo "$DISPLAY"
+    elif [ -S "$XDG_RUNTIME_DIR/wayland-0" ]; then
+        echo "wayland-0"
+    else
+        echo ":0"
+    fi
+}
+
+# Lanzar Firefox en background (no bloquea terminal)
+# Uso: ff [url]
+ff() {
+    local display=$(get_display)
+    DISPLAY="$display" firefox "$@" >/dev/null 2>&1 &
+    disown
+}
+
+# Lanzar Firefox en TTY virtual (hacia sesión X11 activa)
+# Uso: ff-remote [url]
+ff-remote() {
+    DISPLAY=:0 firefox "$@" >/dev/null 2>&1 &
+    disown
+    echo "✓ Firefox lanzado en DISPLAY=:0 (Ctrl+Alt+F7 para verlo)"
+}
+
+# Lanzar Firefox con logs visibles (para debug)
+ff-debug() {
+    local display=$(get_display)
+    DISPLAY="$display" firefox --console "$@" &
+}
+
+# ==============================================================================
+# TMUX - Gestor de sesiones y paneles
+# ==============================================================================
+
+# Crear sesión TMUX dev con layout 3 paneles
+tmux-dev() {
+    local session="${1:-dev}"
+    tmux new-session -d -s "$session" -c "$HOME" \; \
+        send-keys "clear" C-m \; \
+        split-window -h -p 50 \; \
+        send-keys "clear" C-m \; \
+        split-window -v -p 50 \; \
+        send-keys "clear" C-m \; \
+        select-pane -L
+    echo "✓ Sesión TMUX '$session' creada con layout 3 paneles"
+}
+
+# Listar sesiones TMUX activas
+tmux-list() {
+    tmux list-sessions -F "#{session_name}: #{session_windows}w × #{session_panes}p" 2>/dev/null || echo "Sin sesiones TMUX activas"
+}
+
+# Attacharse a sesión (o crearla si no existe)
+tmux-attach() {
+    local session="${1:-dev}"
+    if tmux has-session -t "$session" 2>/dev/null; then
+        tmux attach-session -t "$session"
+    else
+        tmux-dev "$session" && tmux attach-session -t "$session"
+    fi
+}
+
+# ==============================================================================
+# NEOVIM - Editor modal
+# ==============================================================================
+
+alias vi="nvim"
+alias vim="nvim"
+
+# Abrir Neovim en nuevo pane TMUX
+nvim-pane() {
+    local file="${1:-.}"
+    tmux split-window -h "nvim '$file'"
+}
+
+# ==============================================================================
+# VT (Virtual Terminal) - Consolas del sistema
+# ==============================================================================
+
+# Ver información de TTY/DISPLAY actual
+vt-info() {
+    echo "TTY actual: $(tty)"
+    echo "DISPLAY: ${DISPLAY:-none}"
+    echo "Sesiones TMUX: $(tmux list-sessions 2>/dev/null | wc -l)"
+}
+
+# ==============================================================================
+# LENGUAJE TÉCNICO - Tabla de referencia
+# ==============================================================================
+
+tech-terms() {
+    cat << 'EOF'
+┌─ TÉRMINOS TÉCNICOS CORRECTOS ─────────────────────────────┐
+│                                                              │
+│ ✓ CORRECTO           │ ✗ INCORRECTO                         │
+│ ─────────────────────┼──────────────────────────────────    │
+│ TTY / Consola virtual│ "Pantalla negra"                     │
+│ Servidor gráfico     │ "Pantalla" / "GUI"                   │
+│ DISPLAY              │ "Pantalla del X11"                   │
+│ Instanciar proceso   │ "Abrir" / "Lanzar"                   │
+│ Forkear              │ "Ejecutar en background" (&)         │
+│ Desvincularse        │ "Separarse" (disown)                 │
+│ Multiplexor terminal │ "Gestor de paneles"                  │
+│ Sesión TMUX          │ "Ventana de trabajo"                 │
+│ Pane (panel)         │ "Sección de pantalla"                │
+│ Script shell         │ "Archivo de comandos"                │
+│ Exportar variable    │ "Definir variable" (export VAR=x)    │
+│ Redirección (>)      │ "Guardar salida en archivo"          │
+│ Pipe (|)             │ "Pasar salida a otro comando"        │
+│ Protocolo gráfico    │ "Sistema de ventanas"                │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+EOF
+}
+
+alias terminos='tech-terms'
