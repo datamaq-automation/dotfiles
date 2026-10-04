@@ -47,28 +47,28 @@ Documento de auditoría técnica, decisiones de diseño y hoja de ruta para la o
 ## 3. Tareas por Hacer (Backlog Priorizado)
 
 ### Fase 1: Optimización de TMUX (Inmediata / Sin riesgos)
-- [ ] Configurar `escape-time 10` en `~/.tmux.conf` para eliminar lag en modo Vi / Neovim.
-- [ ] Configurar `set -as terminal-features ",xterm-256color:RGB"` y `default-terminal "tmux-256color"` para True Color.
-- [ ] Habilitar `set -g focus-events on`.
-- [ ] Habilitar `set -g renumber-windows on`.
-- [ ] Completar keybindings de vi-mode en selección visual (`v` y `Ctrl+V`).
-- [ ] Condicionar o remover la llamada a `battery.sh` en la status bar si no existe batería de hardware.
-- [ ] Configurar `bind c new-window -c "#{pane_current_path}"` para preservar el directorio al abrir ventanas.
+- [x] Configurar `escape-time 10` en `~/.tmux.conf` para eliminar lag en modo Vi / Neovim.
+- [x] Configurar `set -as terminal-features ",xterm-256color:RGB"` y `default-terminal "tmux-256color"` para True Color.
+- [x] Habilitar `set -g focus-events on`.
+- [x] Habilitar `set -g renumber-windows on`.
+- [x] Completar keybindings de vi-mode en selección visual (`v` y `Ctrl+V`).
+- [x] Condicionar o remover la llamada a `battery.sh` en la status bar si no existe batería de hardware.
+- [x] Configurar `bind c new-window -c "#{pane_current_path}"` para preservar el directorio al abrir ventanas.
 
 ### Fase 2: Optimización de Atuin (Inmediata / Sin riesgos)
-- [ ] Habilitar `[tmux] enabled = true`, `width = "85%"`, `height = "65%"` en `~/.config/atuin/config.toml`.
-- [ ] Configurar `search_mode = "fuzzy"`.
-- [ ] Configurar `filter_mode_shell_up_key_binding = "session"` (la flecha arriba busca en el contexto de la sesión actual de TMUX).
-- [ ] Activar `style = "compact"` y `show_preview = true`.
+- [x] Habilitar `[tmux] enabled = true`, `width = "85%"`, `height = "65%"` en `~/.config/atuin/config.toml`.
+- [x] Configurar `search_mode = "fuzzy"`.
+- [x] Configurar `filter_mode_shell_up_key_binding = "session"` (la flecha arriba busca en el contexto de la sesión actual de TMUX).
+- [x] Activar `style = "compact"` y `show_preview = true`.
 
 ### Fase 3: Integración Zoxide + TMUX (Sinergia del Trío)
-- [ ] Evaluar y aplicar `eval "$(zoxide init bash --cmd cd)"` en `~/.bashrc`.
-- [ ] Agregar alias `alias j="z"` en `~/.bash_aliases`.
-- [ ] Implementar la función `tz()` (*TMUX-Zoxide Sessionizer*) en ↗ [~/.bash_aliases](file:///home/agustin/.bash_aliases) y en ↗ [.bash_aliases.public](file:///home/agustin/proyectos_software/dotfiles/.bash_aliases.public).
-- [ ] Instalar o descargar `fzf` en `~/.local/bin/fzf` para desbloquear `zi` y selectores interactivos flotantes en TMUX.
+- [ ] *(Duda D1 - Requiere decisión)* Evaluar y aplicar `eval "$(zoxide init bash --cmd cd)"` en `~/.bashrc`.
+- [x] Agregar alias `alias j="z"` en `~/.bash_aliases`.
+- [x] Implementar la función `tz()` (*TMUX-Zoxide Sessionizer*) en ↗ [~/.bash_aliases](file:///home/agustin/.bash_aliases) y en ↗ [.bash_aliases.public](file:///home/agustin/proyectos_software/dotfiles/.bash_aliases.public).
+- [ ] *(Duda D2 - Requiere decisión)* Instalar o descargar `fzf` en `~/.local/bin/fzf` para desbloquear `zi` y selectores interactivos flotantes en TMUX.
 
 ### Fase 4: Limpieza y Mantenimiento del Repositorio
-- [ ] Reemplazar placeholder `<repo>` por `https://github.com/datamaq-automation/dotfiles.git` en ↗ [INSTALL.md](file:///home/agustin/proyectos_software/dotfiles/INSTALL.md#L17).
-- [ ] Unificar el `.tmux.conf` del repositorio con las mejoras aplicadas en `~/.tmux.conf`.
-- [ ] Documentar en ↗ [README.md](file:///home/agustin/proyectos_software/dotfiles/README.md) el uso conjunto de TMUX, Atuin y Zoxide.
-- [ ] Commit y push a `origin/main`.
+- [x] Reemplazar placeholder `<repo>` por `https://github.com/datamaq-automation/dotfiles.git` en ↗ [INSTALL.md](file:///home/agustin/proyectos_software/dotfiles/INSTALL.md#L17).
+- [x] Unificar el `.tmux.conf` del repositorio con las mejoras de rendimiento aplicadas en `~/.tmux.conf`.
+- [x] Documentar en ↗ [README.md](file:///home/agustin/proyectos_software/dotfiles/README.md) el uso conjunto de TMUX, Atuin y Zoxide.
+- [x] Commit y push a `origin/main`.

@@ -14,7 +14,7 @@ Configuración minimalista para desarrolladores que usan **TMUX**, **Neovim** y 
 ### 1. Clonar o descargar
 
 ```bash
-git clone <repo> ~/proyectos_software/dotfiles
+git clone https://github.com/datamaq-automation/dotfiles.git ~/proyectos_software/dotfiles
 cd ~/proyectos_software/dotfiles
 ```
 

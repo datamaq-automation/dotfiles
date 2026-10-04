@@ -76,6 +76,39 @@ tmux-attach() {
 }
 
 # ==============================================================================
+# ZOXIDE & TMUX - Sinergia de navegación y sessionizer
+# ==============================================================================
+
+# Alias ultracorto para zoxide
+alias j="z"
+
+# TMUX-Zoxide Sessionizer: salta o crea una sesión TMUX basada en zoxide
+tz() {
+    local target
+    if [ -n "$1" ]; then
+        target=$(zoxide query "$1" 2>/dev/null)
+        if [ -z "$target" ] && [ -d "$1" ]; then
+            target=$(realpath "$1")
+        fi
+    fi
+    if [ -z "$target" ]; then
+        target=$(pwd)
+    fi
+
+    local session_name
+    session_name=$(basename "$target" | tr '.' '_')
+
+    if [ -n "$TMUX" ]; then
+        if ! tmux has-session -t "$session_name" 2>/dev/null; then
+            tmux new-session -d -s "$session_name" -c "$target"
+        fi
+        tmux switch-client -t "$session_name"
+    else
+        tmux new-session -A -s "$session_name" -c "$target"
+    fi
+}
+
+# ==============================================================================
 # NEOVIM - Editor modal
 # ==============================================================================
 

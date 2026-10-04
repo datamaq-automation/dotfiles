@@ -27,12 +27,13 @@ Configuración minimalista para desarrolladores que viven en la terminal.
 
 ```
 dotfiles/
-├── .bash_aliases.public     # Firefox + TMUX + Neovim aliases
+├── .bash_aliases.public     # Firefox + TMUX + Neovim + tz (Zoxide) aliases
 ├── .config/nvim/init.lua    # Neovim minimalista (0 plugins)
-├── .tmux.conf               # TMUX: 3 paneles + keybindings
+├── .tmux.conf               # TMUX: configuración optimizada + True Color
 ├── INSTALL.md               # Guía de instalación completa
 ├── README.md                # Este archivo
 └── docs/
+    ├── HALLAZGOS_Y_PENDIENTES.md # Auditoría, dudas y roadmap de optimización
     └── LANGUAGE.md          # Referencia técnica (TTY, DISPLAY, etc)
 ```
 
@@ -116,12 +117,27 @@ vi archivo.txt              # Abre con tu config
 terminos
 ```
 
-Muestra tabla de términos correctos (TTY vs DISPLAY, instanciar vs "abrir", etc).
+### ⚡ TMUX + Atuin + Zoxide (Sinergia)
+
+```bash
+# Saltar o crear una sesión TMUX basada en directorios frecuentes de zoxide
+tz dotfiles            # Crea o conmuta a sesión 'dotfiles' en ~/proyectos_software/dotfiles
+tz mi-proyecto         # Busca en zoxide y conecta directamente
+j dotfiles             # Alias ultracorto para saltar con zoxide
+```
+
+**Atajos y Flujo dentro de TMUX**:
+- `Ctrl+R` — Abre **Atuin** en una ventana emergente flotante (*popup*) sin ensuciar la terminal.
+- `Flecha Arriba (↑)` — Busca comandos restringidos **exclusivamente a la sesión actual**.
+- `Ctrl+A Ctrl+T` — Despliega una terminal flotante temporal (*scratchpad popup*).
+- `Ctrl+A |` / `Ctrl+A -` — Dividir vertical / horizontal conservando el directorio actual.
+- `Alt + Flechas` — Navegar entre paneles sin prefijo.
 
 ## 📚 Documentación
 
 - **[INSTALL.md](INSTALL.md)** — Instalación paso a paso, FAQ
 - **[LANGUAGE.md](docs/LANGUAGE.md)** — Referencia técnica completa (X11, Wayland, TTY, TMUX, Neovim)
+- **[HALLAZGOS_Y_PENDIENTES.md](docs/HALLAZGOS_Y_PENDIENTES.md)** — Auditoría, dudas y hoja de ruta de optimización
 
 ## 🎓 Para Estudiantes
 
