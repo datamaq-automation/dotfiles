@@ -79,8 +79,10 @@ tmux-attach() {
 # ZOXIDE & TMUX - Sinergia de navegación y sessionizer
 # ==============================================================================
 
-# Alias ultracorto para zoxide
-alias j="z"
+# Atajos para zoxide (con `zoxide init --cmd cd` las funciones son cd/cdi, no z/zi)
+alias z="cd"
+alias zi="cdi"
+alias j="cd"
 
 # TMUX-Zoxide Sessionizer: salta o crea una sesión TMUX basada en zoxide (con selector interactivo fzf)
 tz() {
